@@ -24,7 +24,7 @@ public class TODOController {
         return todoService.getAll();
     }
 
-    @GetMapping(value = "{id}", produces = { MediaType.APPLICATION_JSON_VALUE })
+    @GetMapping(value = "/{id}", produces = { MediaType.APPLICATION_JSON_VALUE })
     public TODOEntity getById(@PathVariable String id){
         return todoService.getById(id);
     }

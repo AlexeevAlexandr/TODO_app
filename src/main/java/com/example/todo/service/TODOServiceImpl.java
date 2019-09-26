@@ -1,6 +1,7 @@
 package com.example.todo.service;
 
 import com.example.todo.entity.TODOEntity;
+import com.example.todo.exception.TODOException;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
@@ -41,8 +42,7 @@ public class TODOServiceImpl implements TODOService{
             log.info("Set the method for the URL request");
             con.setRequestMethod("GET");
         } catch (ProtocolException e) {
-            log.error("Error in the underlying protocol");
-            e.printStackTrace();
+            log.debug("Error in the underlying protocol \n" + e.getMessage());
         }
 
         TODOEntity[] todoEntity = new TODOEntity[0];
@@ -54,8 +54,7 @@ public class TODOServiceImpl implements TODOService{
         try (BufferedReader in = new BufferedReader(new InputStreamReader(con.getInputStream()))) {
             todoEntity = mapper.readValue(in.readLine(), TODOEntity[].class);
         } catch (IOException e) {
-            e.printStackTrace();
-            log.error("Can not read data");
+            log.debug("Can not read data \n" + e.getMessage());
         }
 
         List<TODOEntity> content = new ArrayList<>(Arrays.asList(todoEntity));
@@ -72,13 +71,12 @@ public class TODOServiceImpl implements TODOService{
             log.info("Set the method for the URL request");
             con.setRequestMethod("GET");
         } catch (ProtocolException e) {
-            log.error("Error in the underlying protocol");
-            e.printStackTrace();
+            log.debug("Error in the underlying protocol \n" + e.getMessage());
         }
 
         con.setRequestProperty("Content-Type", "application/json");
 
-        TODOEntity todoEntity = new TODOEntity();
+        TODOEntity todoEntity;
         ObjectMapper mapper = new ObjectMapper()
                 .registerModule(new ParameterNamesModule())
                 .registerModule(new Jdk8Module())
@@ -87,8 +85,8 @@ public class TODOServiceImpl implements TODOService{
         try (BufferedReader in = new BufferedReader(new InputStreamReader(con.getInputStream()))) {
             todoEntity = mapper.readValue(in.readLine(), TODOEntity.class);
         } catch (IOException e) {
-            e.printStackTrace();
-            log.error("Can not read data");
+            log.debug("Can not read data \n" + e.getMessage());
+            throw new TODOException(String.format("Entity with id '%s' not found", id));
         }
 
         con.disconnect();
@@ -106,8 +104,7 @@ public class TODOServiceImpl implements TODOService{
             log.info("Set the method for the URL request");
             con.setRequestMethod("POST");
         } catch (ProtocolException e) {
-            log.error("Error in the underlying protocol");
-            e.printStackTrace();
+            log.debug("Error in the underlying protocol \n" + e.getMessage());
         }
 
         byte[] postData = todoEntity.toString().getBytes(StandardCharsets.UTF_8);
@@ -115,8 +112,7 @@ public class TODOServiceImpl implements TODOService{
             log.info("Write data");
             wr.write(postData);
         } catch (IOException e) {
-            log.error("Can not write data");
-            e.printStackTrace();
+            log.debug("Can not write data \n" + e.getMessage());
         }
 
         try (BufferedReader in = new BufferedReader(new InputStreamReader(con.getInputStream()))) {
@@ -128,8 +124,7 @@ public class TODOServiceImpl implements TODOService{
             }
             log.info("Data has been saved: " + content.toString());
         } catch (IOException e) {
-            e.printStackTrace();
-            log.error("Can not read data");
+            log.debug("Can not read data \n" + e.getMessage());
         }
 
         con.disconnect();
@@ -146,8 +141,7 @@ public class TODOServiceImpl implements TODOService{
             log.info("Set the method for the URL request");
             con.setRequestMethod("PUT");
         } catch (ProtocolException e) {
-            log.error("Error in the underlying protocol");
-            e.printStackTrace();
+            log.debug("Error in the underlying protocol \n" + e.getMessage());
         }
 
         byte[] postData = todoEntity.toString().getBytes(StandardCharsets.UTF_8);
@@ -155,8 +149,7 @@ public class TODOServiceImpl implements TODOService{
             log.info("Update data");
             wr.write(postData);
         } catch (IOException e) {
-            log.error("Can not update data");
-            e.printStackTrace();
+            log.debug("Can not update data \n" + e.getMessage());
         }
 
         try (BufferedReader in = new BufferedReader(new InputStreamReader(con.getInputStream()))) {
@@ -168,8 +161,8 @@ public class TODOServiceImpl implements TODOService{
             }
             log.info("Data has been updated: " + content.toString());
         } catch (IOException e) {
-            e.printStackTrace();
-            log.error("Can not read data");
+            log.debug("Can not read data \n" + e.getMessage());
+            throw new TODOException(String.format("Entity with id '%s' not found", todoEntity.getObjectId()));
         }
 
         con.disconnect();
@@ -188,8 +181,7 @@ public class TODOServiceImpl implements TODOService{
             log.info("Set the method for the URL request");
             con.setRequestMethod("PUT");
         } catch (ProtocolException e) {
-            log.error("Error in the underlying protocol");
-            e.printStackTrace();
+            log.debug("Error in the underlying protocol \n" + e.getMessage());
         }
 
         byte[] postData = todoEntity.toString().getBytes(StandardCharsets.UTF_8);
@@ -197,8 +189,7 @@ public class TODOServiceImpl implements TODOService{
             log.info("Update data");
             wr.write(postData);
         } catch (IOException e) {
-            log.error("Can not update data");
-            e.printStackTrace();
+            log.debug("Can not update data \n" + e.getMessage());
         }
 
         try (BufferedReader in = new BufferedReader(new InputStreamReader(con.getInputStream()))) {
@@ -210,8 +201,7 @@ public class TODOServiceImpl implements TODOService{
             }
             log.info("Data has been updated: " + content.toString());
         } catch (IOException e) {
-            e.printStackTrace();
-            log.error("Can not read data");
+            log.debug("Can not read data \n" + e.getMessage());
         }
 
         con.disconnect();
@@ -223,8 +213,7 @@ public class TODOServiceImpl implements TODOService{
             log.info("Creates a URL object from " + path);
             return new URL(path);
         } catch (MalformedURLException e) {
-            log.error("Invalid URL: " + path);
-            e.printStackTrace();
+            log.debug("Invalid URL \n" + e.getMessage());
             return null;
         }
     }
@@ -234,8 +223,7 @@ public class TODOServiceImpl implements TODOService{
             log.info("Connection to the remote object");
             return (HttpURLConnection) Objects.requireNonNull(url).openConnection();
         } catch (IOException e) {
-            log.error("Can not open connection to url: " + url);
-            e.printStackTrace();
+            log.debug("Can not open connection \n" + e.getMessage());
             return null;
         }
     }

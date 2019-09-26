@@ -16,6 +16,7 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
+import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 
@@ -60,19 +61,7 @@ public class TODOControllerTest {
     }
 
     @Test
-    public void B_getByIdTest() throws Exception {
-        List<TODOEntity> todoEntityList = testHelper.getAll();
-        TODOEntity todoEntity = todoEntityList.get(0);
-        String id = todoEntity.getObjectId();
-
-        mockMvc.perform(MockMvcRequestBuilders.get("/todo/" + id)
-                .accept(MediaType.APPLICATION_JSON))
-                .andExpect(jsonPath("$.objectId").value(id))
-                .andDo(print());
-    }
-
-    @Test
-    public void C_getAllTest() throws Exception {
+    public void B_getAllTest() throws Exception {
         JSONObject jsonObject = testHelper.getJsonObjectFromFile("json/todoEntity.json");
 
         mockMvc.perform(MockMvcRequestBuilders.post("/todo")
@@ -85,6 +74,18 @@ public class TODOControllerTest {
         mockMvc.perform(MockMvcRequestBuilders.get("/todo")
                 .accept(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$", hasSize(2)))
+                .andDo(print());
+    }
+
+    @Test
+    public void C_getByIdTest() throws Exception {
+        List<TODOEntity> todoEntityList = testHelper.getAll();
+        TODOEntity todoEntity = todoEntityList.get(0);
+        String id = todoEntity.getObjectId();
+
+        mockMvc.perform(MockMvcRequestBuilders.get("/todo/" + id)
+                .accept(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$.objectId").value(id))
                 .andDo(print());
     }
 
@@ -116,6 +117,28 @@ public class TODOControllerTest {
                 .accept(MediaType.APPLICATION_JSON)
                 .characterEncoding("UTF-8"))
                 .andExpect(jsonPath("$.completed").value(true))
+                .andDo(print());
+    }
+
+    @Test
+    public void F_getByIdFalseTest() throws Exception {
+        mockMvc.perform(MockMvcRequestBuilders.get("/todo/0123456789"))
+                .andExpect(MockMvcResultMatchers.status().isNotFound())
+                .andDo(print());
+    }
+
+    @Test
+    public void G_updateTodoFalseTest() throws Exception {
+        List<TODOEntity> todoEntityList = testHelper.getAll();
+        TODOEntity todoEntity = todoEntityList.get(0);
+        todoEntity.setObjectId("0123456789");
+
+        mockMvc.perform(MockMvcRequestBuilders.put("/todo")
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .accept(MediaType.APPLICATION_JSON)
+                .characterEncoding("UTF-8")
+                .content(todoEntity.toString()))
+                .andExpect(MockMvcResultMatchers.status().isNotFound())
                 .andDo(print());
     }
 }
