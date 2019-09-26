@@ -65,17 +65,9 @@ public class TODOControllerTest {
         TODOEntity todoEntity = todoEntityList.get(0);
         String id = todoEntity.getObjectId();
 
-        mockMvc.perform(MockMvcRequestBuilders.get("/todo")
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .accept(MediaType.APPLICATION_JSON)
-                .characterEncoding("UTF-8")
-                .content(id))
-                .andDo(print());
-
-        mockMvc.perform(MockMvcRequestBuilders.get("/todo")
+        mockMvc.perform(MockMvcRequestBuilders.get("/todo/" + id)
                 .accept(MediaType.APPLICATION_JSON))
-                .andExpect(jsonPath("$", hasSize(1)))
-                .andExpect(jsonPath("[0].objectId").value(id))
+                .andExpect(jsonPath("$.objectId").value(id))
                 .andDo(print());
     }
 

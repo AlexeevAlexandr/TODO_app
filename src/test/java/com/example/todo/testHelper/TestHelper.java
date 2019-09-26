@@ -38,7 +38,6 @@ public class TestHelper {
                 "9FF8F9DF-9570-641F-FF78-DFFBC3FFA100/data/todo";
 
         HttpURLConnection con = getConnection(getUrl(path));
-
         Objects.requireNonNull(con).setDoInput(true);
 
         try {
