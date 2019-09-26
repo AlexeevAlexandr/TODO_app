@@ -1,6 +1,7 @@
 package com.example.todo;
 
 import com.example.todo.controller.TODOController;
+import com.example.todo.entity.TODOEntity;
 import com.example.todo.testHelper.TestHelper;
 import org.json.simple.JSONObject;
 import org.junit.Before;
@@ -17,6 +18,9 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
+
+import java.time.LocalDate;
+import java.util.List;
 
 import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
@@ -69,6 +73,25 @@ public class TODOControllerTest {
         mockMvc.perform(MockMvcRequestBuilders.get("/todo")
                 .accept(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$", hasSize(2)))
+                .andDo(print());
+    }
+
+    @Test
+    public void C_updateTodoTest() throws Exception {
+        List<TODOEntity> todoEntityList = testHelper.getAll();
+        TODOEntity todoEntity = todoEntityList.get(0);
+        todoEntity.setDescription("updated description");
+        todoEntity.setDeadlineDate(LocalDate.of(2020, 1, 21));
+
+
+        mockMvc.perform(MockMvcRequestBuilders.put("/todo")
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .accept(MediaType.APPLICATION_JSON)
+                .characterEncoding("UTF-8")
+                .content(todoEntity.toString()))
+                .andExpect(jsonPath("$.owner").value("Owner"))
+                .andExpect(jsonPath("$.deadlineDate").value("2020-01-21"))
+                .andExpect(jsonPath("$.description").value("updated description"))
                 .andDo(print());
     }
 }

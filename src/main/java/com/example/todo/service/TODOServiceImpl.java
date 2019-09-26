@@ -35,9 +35,8 @@ public class TODOServiceImpl implements TODOService{
         String path = "https://api.backendless.com/878883AB-5152-C87B-FF2C-11DD779C3900/" +
                 "9FF8F9DF-9570-641F-FF78-DFFBC3FFA100/data/todo";
 
-        URL url = getUrl(path);
 
-        HttpURLConnection con = getConnection(url);
+        HttpURLConnection con = getConnection(getUrl(path));
 
         Objects.requireNonNull(con).setDoOutput(true);
 
@@ -82,9 +81,7 @@ public class TODOServiceImpl implements TODOService{
         String path = "https://api.backendless.com/878883AB-5152-C87B-FF2C-11DD779C3900/" +
                 "9FF8F9DF-9570-641F-FF78-DFFBC3FFA100/data/todo";
 
-        URL url = getUrl(path);
-
-        HttpURLConnection con = getConnection(url);
+        HttpURLConnection con = getConnection(getUrl(path));
 
         Objects.requireNonNull(con).setDoInput(true);
 
@@ -118,7 +115,47 @@ public class TODOServiceImpl implements TODOService{
 
     @Override
     public TODOEntity update(TODOEntity todoEntity) {
-        return null;
+        String path = "https://api.backendless.com/878883AB-5152-C87B-FF2C-11DD779C3900/" +
+                "9FF8F9DF-9570-641F-FF78-DFFBC3FFA100/data/todo/" + todoEntity.getObjectId();
+
+        HttpURLConnection con = getConnection(getUrl(path));
+
+        Objects.requireNonNull(con).setDoOutput(true);
+
+        try {
+            log.info("Set the method for the URL request");
+            con.setRequestMethod("PUT");
+        } catch (ProtocolException e) {
+            log.error("Error in the underlying protocol");
+            e.printStackTrace();
+        }
+
+        con.setRequestProperty("Content-Type", "application/json");
+
+        byte[] postData = todoEntity.toString().getBytes(StandardCharsets.UTF_8);
+        try (DataOutputStream wr = new DataOutputStream(con.getOutputStream())){
+            log.info("Write data");
+            wr.write(postData);
+        } catch (IOException e) {
+            log.error("Can not write data");
+            e.printStackTrace();
+        }
+
+        try (BufferedReader in = new BufferedReader(new InputStreamReader(con.getInputStream()))) {
+            String line;
+            StringBuilder content = new StringBuilder();
+            while ((line = in.readLine()) != null) {
+                content.append(line);
+                content.append(System.lineSeparator());
+            }
+            log.info("Data has been saved: " + content.toString());
+        } catch (IOException e) {
+            e.printStackTrace();
+            log.error("Can not read data");
+        }
+
+        con.disconnect();
+        return todoEntity;
     }
 
     // marks as completed

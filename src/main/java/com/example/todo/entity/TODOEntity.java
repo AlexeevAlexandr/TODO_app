@@ -23,6 +23,7 @@ public class TODOEntity {
     @Override
     public String toString(){
         return "{" +
+                "\"objectId\" : \"" + objectId + "\", " +
                 "\"description\" : \"" + description + "\", " +
                 "\"owner\" : \"" + owner + "\"," +
                 "\"completed\" : \"" + completed + "\"," +
