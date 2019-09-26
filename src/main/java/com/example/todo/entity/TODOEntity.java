@@ -11,6 +11,7 @@ import java.time.LocalDate;
 @Setter
 @NoArgsConstructor
 public class TODOEntity {
+    String objectId;
     String description;
     String owner;
     boolean completed;

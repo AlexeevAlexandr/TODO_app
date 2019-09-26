@@ -56,7 +56,7 @@ public class TODOControllerTest {
     }
 
     @Test
-    public void A_getAllTest() throws Exception {
+    public void B_getAllTest() throws Exception {
         JSONObject jsonObject = testHelper.getJsonObjectFromFile("json/todoEntity.json");
 
         mockMvc.perform(MockMvcRequestBuilders.post("/todo")
