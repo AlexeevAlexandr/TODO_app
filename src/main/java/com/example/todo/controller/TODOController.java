@@ -19,22 +19,22 @@ public class TODOController {
         this.todoService = todoService;
     }
 
-    @GetMapping
+    @GetMapping(value = "", produces = { MediaType.APPLICATION_JSON_VALUE })
     public List<TODOEntity> getAll(){
         return todoService.getAll();
     }
 
-    @PostMapping(value = "/", produces = { MediaType.APPLICATION_JSON_VALUE })
+    @PostMapping(value = "", produces = { MediaType.APPLICATION_JSON_VALUE })
     public TODOEntity create(@RequestBody TODOEntity todoEntity){
         return todoService.create(todoEntity);
     }
 
-    @PutMapping
+    @PutMapping(value = "", produces = { MediaType.APPLICATION_JSON_VALUE })
     public TODOEntity update(@RequestBody TODOEntity todoEntity){
         return todoService.update(todoEntity);
     }
 
-    @DeleteMapping("{id}")
+    @DeleteMapping(value = "{id}", produces = { MediaType.APPLICATION_JSON_VALUE })
     public void delete(@PathVariable long id){
         todoService.delete(id);
     }

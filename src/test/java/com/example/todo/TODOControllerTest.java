@@ -18,6 +18,7 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 
+import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 
@@ -43,7 +44,7 @@ public class TODOControllerTest {
     public void A_createTodoTest() throws Exception {
         JSONObject jsonObject = testHelper.getJsonObjectFromFile("json/todoEntity.json");
 
-        mockMvc.perform(MockMvcRequestBuilders.post("/todo/")
+        mockMvc.perform(MockMvcRequestBuilders.post("/todo")
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .accept(MediaType.APPLICATION_JSON)
                 .characterEncoding("UTF-8")
@@ -51,6 +52,23 @@ public class TODOControllerTest {
                 .andExpect(jsonPath("$.owner").value("Owner"))
                 .andExpect(jsonPath("$.deadlineDate").value("2020-01-01"))
                 .andExpect(jsonPath("$.description").value("description"))
+                .andDo(print());
+    }
+
+    @Test
+    public void A_getAllTest() throws Exception {
+        JSONObject jsonObject = testHelper.getJsonObjectFromFile("json/todoEntity.json");
+
+        mockMvc.perform(MockMvcRequestBuilders.post("/todo")
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .accept(MediaType.APPLICATION_JSON)
+                .characterEncoding("UTF-8")
+                .content(jsonObject.toString()))
+                .andDo(print());
+
+        mockMvc.perform(MockMvcRequestBuilders.get("/todo")
+                .accept(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$", hasSize(2)))
                 .andDo(print());
     }
 }
