@@ -24,6 +24,11 @@ public class TODOController {
         return todoService.getAll();
     }
 
+    @GetMapping(value = "{id}", produces = { MediaType.APPLICATION_JSON_VALUE })
+    public TODOEntity getById(@PathVariable String id){
+        return todoService.getById(id);
+    }
+
     @PostMapping(value = "", produces = { MediaType.APPLICATION_JSON_VALUE })
     public TODOEntity create(@RequestBody TODOEntity todoEntity){
         return todoService.create(todoEntity);
@@ -35,7 +40,7 @@ public class TODOController {
     }
 
     @DeleteMapping(value = "{id}", produces = { MediaType.APPLICATION_JSON_VALUE })
-    public void delete(@PathVariable long id){
+    public void delete(@PathVariable String id){
         todoService.delete(id);
     }
 }

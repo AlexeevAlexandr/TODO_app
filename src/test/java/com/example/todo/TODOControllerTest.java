@@ -60,7 +60,27 @@ public class TODOControllerTest {
     }
 
     @Test
-    public void B_getAllTest() throws Exception {
+    public void B_getByIdTest() throws Exception {
+        List<TODOEntity> todoEntityList = testHelper.getAll();
+        TODOEntity todoEntity = todoEntityList.get(0);
+        String id = todoEntity.getObjectId();
+
+        mockMvc.perform(MockMvcRequestBuilders.get("/todo")
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .accept(MediaType.APPLICATION_JSON)
+                .characterEncoding("UTF-8")
+                .content(id))
+                .andDo(print());
+
+        mockMvc.perform(MockMvcRequestBuilders.get("/todo")
+                .accept(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$", hasSize(1)))
+                .andExpect(jsonPath("[0].objectId").value(id))
+                .andDo(print());
+    }
+
+    @Test
+    public void C_getAllTest() throws Exception {
         JSONObject jsonObject = testHelper.getJsonObjectFromFile("json/todoEntity.json");
 
         mockMvc.perform(MockMvcRequestBuilders.post("/todo")
@@ -77,7 +97,7 @@ public class TODOControllerTest {
     }
 
     @Test
-    public void C_updateTodoTest() throws Exception {
+    public void D_updateTodoTest() throws Exception {
         List<TODOEntity> todoEntityList = testHelper.getAll();
         TODOEntity todoEntity = todoEntityList.get(0);
         todoEntity.setDescription("updated description");
@@ -94,4 +114,6 @@ public class TODOControllerTest {
                 .andExpect(jsonPath("$.description").value("updated description"))
                 .andDo(print());
     }
+
+
 }

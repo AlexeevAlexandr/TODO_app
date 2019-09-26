@@ -8,9 +8,11 @@ public interface TODOService {
 
     TODOEntity create(TODOEntity todoEntity);
 
+    TODOEntity getById(String id);
+
     List<TODOEntity> getAll();
 
     TODOEntity update(TODOEntity todoEntity);
 
-    void delete(long id);
+    void delete(String id);
 }

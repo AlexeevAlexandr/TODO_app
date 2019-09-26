@@ -28,62 +28,14 @@ import java.util.Objects;
 @Slf4j
 public class TODOServiceImpl implements TODOService{
 
-    @Override
-    public TODOEntity create(TODOEntity todoEntity) {
-        todoEntity.setCreationDate(LocalDate.now());
-
-        String path = "https://api.backendless.com/878883AB-5152-C87B-FF2C-11DD779C3900/" +
-                "9FF8F9DF-9570-641F-FF78-DFFBC3FFA100/data/todo";
-
-
-        HttpURLConnection con = getConnection(getUrl(path));
-
-        Objects.requireNonNull(con).setDoOutput(true);
-
-        try {
-            log.info("Set the method for the URL request");
-            con.setRequestMethod("POST");
-        } catch (ProtocolException e) {
-            log.error("Error in the underlying protocol");
-            e.printStackTrace();
-        }
-
-        con.setRequestProperty("Content-Type", "application/json");
-
-        byte[] postData = todoEntity.toString().getBytes(StandardCharsets.UTF_8);
-        try (DataOutputStream wr = new DataOutputStream(con.getOutputStream())){
-            log.info("Write data");
-            wr.write(postData);
-        } catch (IOException e) {
-            log.error("Can not write data");
-            e.printStackTrace();
-        }
-
-        try (BufferedReader in = new BufferedReader(new InputStreamReader(con.getInputStream()))) {
-            String line;
-            StringBuilder content = new StringBuilder();
-            while ((line = in.readLine()) != null) {
-                content.append(line);
-                content.append(System.lineSeparator());
-            }
-            log.info("Data has been saved: " + content.toString());
-        } catch (IOException e) {
-            e.printStackTrace();
-            log.error("Can not read data");
-        }
-
-        con.disconnect();
-        return todoEntity;
-    }
+    private String path = "https://api.backendless.com/878883AB-5152-C87B-FF2C-11DD779C3900/" +
+            "9FF8F9DF-9570-641F-FF78-DFFBC3FFA100/data/todo";
 
     @Override
     public List<TODOEntity> getAll() {
-        String path = "https://api.backendless.com/878883AB-5152-C87B-FF2C-11DD779C3900/" +
-                "9FF8F9DF-9570-641F-FF78-DFFBC3FFA100/data/todo";
-
         HttpURLConnection con = getConnection(getUrl(path));
-
         Objects.requireNonNull(con).setDoInput(true);
+        con.setRequestProperty("Content-Type", "application/json");
 
         try {
             log.info("Set the method for the URL request");
@@ -92,8 +44,6 @@ public class TODOServiceImpl implements TODOService{
             log.error("Error in the underlying protocol");
             e.printStackTrace();
         }
-
-        con.setRequestProperty("Content-Type", "application/json");
 
         TODOEntity[] todoEntity = new TODOEntity[0];
         ObjectMapper mapper = new ObjectMapper()
@@ -114,23 +64,51 @@ public class TODOServiceImpl implements TODOService{
     }
 
     @Override
-    public TODOEntity update(TODOEntity todoEntity) {
-        String path = "https://api.backendless.com/878883AB-5152-C87B-FF2C-11DD779C3900/" +
-                "9FF8F9DF-9570-641F-FF78-DFFBC3FFA100/data/todo/" + todoEntity.getObjectId();
-
-        HttpURLConnection con = getConnection(getUrl(path));
-
-        Objects.requireNonNull(con).setDoOutput(true);
+    public TODOEntity getById(String id) {
+        HttpURLConnection con = getConnection(getUrl(path + "/" + id));
+        Objects.requireNonNull(con).setDoInput(true);
 
         try {
             log.info("Set the method for the URL request");
-            con.setRequestMethod("PUT");
+            con.setRequestMethod("GET");
         } catch (ProtocolException e) {
             log.error("Error in the underlying protocol");
             e.printStackTrace();
         }
 
         con.setRequestProperty("Content-Type", "application/json");
+
+        TODOEntity todoEntity = new TODOEntity();
+        ObjectMapper mapper = new ObjectMapper()
+                .registerModule(new ParameterNamesModule())
+                .registerModule(new Jdk8Module())
+                .registerModule(new JavaTimeModule())
+                .disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
+        try (BufferedReader in = new BufferedReader(new InputStreamReader(con.getInputStream()))) {
+            todoEntity = mapper.readValue(in.readLine(), TODOEntity.class);
+        } catch (IOException e) {
+            e.printStackTrace();
+            log.error("Can not read data");
+        }
+
+        con.disconnect();
+        return todoEntity;
+    }
+
+    @Override
+    public TODOEntity create(TODOEntity todoEntity) {
+        todoEntity.setCreationDate(LocalDate.now());
+        HttpURLConnection con = getConnection(getUrl(path));
+        Objects.requireNonNull(con).setDoOutput(true);
+        con.setRequestProperty("Content-Type", "application/json");
+
+        try {
+            log.info("Set the method for the URL request");
+            con.setRequestMethod("POST");
+        } catch (ProtocolException e) {
+            log.error("Error in the underlying protocol");
+            e.printStackTrace();
+        }
 
         byte[] postData = todoEntity.toString().getBytes(StandardCharsets.UTF_8);
         try (DataOutputStream wr = new DataOutputStream(con.getOutputStream())){
@@ -158,9 +136,49 @@ public class TODOServiceImpl implements TODOService{
         return todoEntity;
     }
 
+    @Override
+    public TODOEntity update(TODOEntity todoEntity) {
+        HttpURLConnection con = getConnection(getUrl(path + "/" + todoEntity.getObjectId()));
+        Objects.requireNonNull(con).setDoOutput(true);
+        con.setRequestProperty("Content-Type", "application/json");
+
+        try {
+            log.info("Set the method for the URL request");
+            con.setRequestMethod("PUT");
+        } catch (ProtocolException e) {
+            log.error("Error in the underlying protocol");
+            e.printStackTrace();
+        }
+
+        byte[] postData = todoEntity.toString().getBytes(StandardCharsets.UTF_8);
+        try (DataOutputStream wr = new DataOutputStream(con.getOutputStream())){
+            log.info("Update data");
+            wr.write(postData);
+        } catch (IOException e) {
+            log.error("Can not update data");
+            e.printStackTrace();
+        }
+
+        try (BufferedReader in = new BufferedReader(new InputStreamReader(con.getInputStream()))) {
+            String line;
+            StringBuilder content = new StringBuilder();
+            while ((line = in.readLine()) != null) {
+                content.append(line);
+                content.append(System.lineSeparator());
+            }
+            log.info("Data has been updated: " + content.toString());
+        } catch (IOException e) {
+            e.printStackTrace();
+            log.error("Can not read data");
+        }
+
+        con.disconnect();
+        return todoEntity;
+    }
+
     // marks as completed
     @Override
-    public void delete(long id) {
+    public void delete(String id) {
 
     }
 
