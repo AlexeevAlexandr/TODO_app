@@ -141,4 +141,11 @@ public class TODOControllerTest {
                 .andExpect(MockMvcResultMatchers.status().isNotFound())
                 .andDo(print());
     }
+
+    @Test
+    public void G_markAsCompletedFalseTest() throws Exception {
+        mockMvc.perform(MockMvcRequestBuilders.delete("/todo/0123456789"))
+                .andExpect(MockMvcResultMatchers.status().isNotFound())
+                .andDo(print());
+    }
 }

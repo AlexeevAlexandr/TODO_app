@@ -39,7 +39,7 @@ public class TODOController {
         return todoService.update(todoEntity);
     }
 
-    @DeleteMapping(value = "{id}", produces = { MediaType.APPLICATION_JSON_VALUE })
+    @DeleteMapping(value = "/{id}", produces = { MediaType.APPLICATION_JSON_VALUE })
     public TODOEntity markAsCompleted(@PathVariable String id){
         return todoService.markAsCompleted(id);
     }

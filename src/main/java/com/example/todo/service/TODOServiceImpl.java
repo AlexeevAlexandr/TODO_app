@@ -202,6 +202,7 @@ public class TODOServiceImpl implements TODOService{
             log.info("Data has been updated: " + content.toString());
         } catch (IOException e) {
             log.debug("Can not read data \n" + e.getMessage());
+            throw new TODOException(String.format("Entity by id '%s' not found", id));
         }
 
         con.disconnect();
