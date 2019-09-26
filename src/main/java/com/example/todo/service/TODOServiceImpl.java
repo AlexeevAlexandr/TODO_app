@@ -176,10 +176,46 @@ public class TODOServiceImpl implements TODOService{
         return todoEntity;
     }
 
-    // marks as completed
     @Override
-    public void delete(String id) {
+    public TODOEntity markAsCompleted(String id) {
+        TODOEntity todoEntity = getById(id);
+        todoEntity.setCompleted(true);
+        HttpURLConnection con = getConnection(getUrl(path + "/" + id));
+        Objects.requireNonNull(con).setDoOutput(true);
+        con.setRequestProperty("Content-Type", "application/json");
 
+        try {
+            log.info("Set the method for the URL request");
+            con.setRequestMethod("PUT");
+        } catch (ProtocolException e) {
+            log.error("Error in the underlying protocol");
+            e.printStackTrace();
+        }
+
+        byte[] postData = todoEntity.toString().getBytes(StandardCharsets.UTF_8);
+        try (DataOutputStream wr = new DataOutputStream(con.getOutputStream())){
+            log.info("Update data");
+            wr.write(postData);
+        } catch (IOException e) {
+            log.error("Can not update data");
+            e.printStackTrace();
+        }
+
+        try (BufferedReader in = new BufferedReader(new InputStreamReader(con.getInputStream()))) {
+            String line;
+            StringBuilder content = new StringBuilder();
+            while ((line = in.readLine()) != null) {
+                content.append(line);
+                content.append(System.lineSeparator());
+            }
+            log.info("Data has been updated: " + content.toString());
+        } catch (IOException e) {
+            e.printStackTrace();
+            log.error("Can not read data");
+        }
+
+        con.disconnect();
+        return todoEntity;
     }
 
     private URL getUrl(String path){

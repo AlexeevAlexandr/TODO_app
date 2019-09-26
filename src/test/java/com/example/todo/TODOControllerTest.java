@@ -103,7 +103,6 @@ public class TODOControllerTest {
         todoEntity.setDescription("updated description");
         todoEntity.setDeadlineDate(LocalDate.of(2020, 1, 21));
 
-
         mockMvc.perform(MockMvcRequestBuilders.put("/todo")
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .accept(MediaType.APPLICATION_JSON)
@@ -115,5 +114,16 @@ public class TODOControllerTest {
                 .andDo(print());
     }
 
+    @Test
+    public void E_markAsCompletedTest() throws Exception {
+        List<TODOEntity> todoEntityList = testHelper.getAll();
+        TODOEntity todoEntity = todoEntityList.get(0);
+        String id = todoEntity.getObjectId();
 
+        mockMvc.perform(MockMvcRequestBuilders.delete("/todo/" + id)
+                .accept(MediaType.APPLICATION_JSON)
+                .characterEncoding("UTF-8"))
+                .andExpect(jsonPath("$.completed").value(true))
+                .andDo(print());
+    }
 }

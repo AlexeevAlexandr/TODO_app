@@ -14,5 +14,5 @@ public interface TODOService {
 
     TODOEntity update(TODOEntity todoEntity);
 
-    void delete(String id);
+    TODOEntity markAsCompleted(String id);
 }
